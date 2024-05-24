@@ -6,6 +6,8 @@ use App\Http\Controllers\boxes\BoxesApiController;
 use App\Http\Controllers\categories\CategoriesApiController;
 use App\Http\Controllers\comments\AnswercommentsApiController;
 use App\Http\Controllers\comments\CommentsApiController;
+use App\Http\Controllers\notifies\NotifiesApiController;
+use App\Http\Controllers\notifies\UsernotifiesApiController;
 use App\Http\Controllers\publishs\PublishsApiController;
 use App\Http\Controllers\Publishsboxes\PublishsboxesApiController;
 use Illuminate\Support\Facades\Route;
@@ -55,4 +57,21 @@ Route::get('/boxes',[BoxesApiController::class, 'read'])->middleware('auth:sanct
 Route::patch('/boxes/{id}',[BoxesApiController::class, 'updateById'])->middleware('auth:sanctum');
 Route::delete('/boxes/{id}',[BoxesApiController::class, 'deleteById'])->middleware('auth:sanctum');
 
-Route::post('/publishs/{id}/boxes/create',[PublishsboxesApiController::class, 'createByIdPublish'])->middleware('auth:sanctum');
+Route::post('/publishs/{id}/boxes/create',[PublishsboxesApiController::class, 'create'])->middleware('auth:sanctum');
+Route::get('/boxes/{id}/publishs',[PublishsboxesApiController::class, 'readPublishsInBox'])->middleware('auth:sanctum');
+Route::patch('/publishs/{id}/boxes/update',[PublishsboxesApiController::class, 'updateByIdPublish'])->middleware('auth:sanctum');
+Route::delete('boxes/{box_id}/publishs/{id}',[PublishsboxesApiController::class, 'deleteById'])->middleware('auth:sanctum');
+
+Route::post('/notifies/create',[NotifiesApiController::class, 'create'])->middleware('auth:sanctum');
+Route::get('/notifies',[NotifiesApiController::class, 'read'])->middleware('auth:sanctum');
+Route::patch('/notifies/{id}/update',[NotifiesApiController::class, 'updateById'])->middleware('auth:sanctum');
+Route::delete('/notifies/{id}',[NotifiesApiController::class, 'deleteById'])->middleware('auth:sanctum');
+
+
+Route::post('/notifies/{id}/users/create',[UsernotifiesApiController::class, 'createByIdNotify'])->middleware('auth:sanctum');
+Route::get('/usersnotifies',[UsernotifiesApiController::class, 'readUserNotifies'])->middleware('auth:sanctum');
+Route::patch('/notifies/{id}/user/{user_id}/update',[UsernotifiesApiController::class, 'updateByIdUsernotifies'])->middleware('auth:sanctum');
+Route::delete('/notifies/{id}/user/{user_id}',[UsernotifiesApiController::class, 'deleteById'])->middleware('auth:sanctum');
+
+
+

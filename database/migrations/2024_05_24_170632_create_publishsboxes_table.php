@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('usersnotifies', function (Blueprint $table) {
+        Schema::create('publishsboxes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained(
-                table: 'users', indexName: 'usersnotifies_user_id'
+            $table->foreignId('publish_id')->constrained(
+                table: 'publishs', indexName: 'publishsboxes_publish_id'
             );
-            $table->foreignId('notify_id')->constrained(
-                table: 'notifies', indexName: 'notify_id'
+            $table->foreignId('box_id')->constrained(
+                table: 'boxes', indexName: 'box_id'
             );
             $table->timestamps();
         });
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('usersnotifies');
+        Schema::dropIfExists('publishsboxes');
     }
 };
