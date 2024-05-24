@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Publishsboxes;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateCategoriesApiRequest;
+use App\Models\Publishs;
 use App\Models\Publishsboxes;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PublishsboxesApiController extends Controller
 {
-    public function createByIdPublish(CreateCategoriesApiRequest $request, $id): JsonResponse
+    public function create(Request $request, $id): JsonResponse
     {
         $data = $request->all();
         Publishsboxes::create([
@@ -24,26 +24,26 @@ class PublishsboxesApiController extends Controller
         ], 201);
     }
 
-    public function read(Request $request, $id): JsonResponse
+    public function readPublishsInBox(Request $request, $id): JsonResponse
     {
-        $Publishsboxes = Publishsboxes::all();
-        return response()->json($Publishsboxes);
+        $ff_publ_id = Publishsboxes::where('box_id', $id)->get('publish_id');
+        $publishs = Publishs::where('id', $ff_publ_id[0]['publish_id'])->get();
+        return response()->json($publishs);
     }
-
-    public function updateById(Request $request, $id): JsonResponse
+    public function updateByIdPublish(Request $request, $id): JsonResponse
     {
-        $Publishsboxes = Publishsboxes::find($id);
+        $Publishsboxes = Publishsboxes::where('publish_id', $id)->get()[0];
 
         $Publishsboxes->update([
-            'name' => $request->input('name', $Publishsboxes->name),
+            'box_id' => $request->input('box_id', $Publishsboxes->box_id),
         ]);
         $Publishsboxes->save();
         return response()->json($Publishsboxes);
     }
 
-    public function deleteById(Request $request, $id): JsonResponse
+    public function deleteById(Request $request, $box_id, $id): JsonResponse
     {
-        $Publishsboxes = Publishsboxes::find($id);
+        $Publishsboxes = Publishsboxes::where(['publish_id'=>$id, 'box_id'=>$box_id])->get()[0];
         $Publishsboxes->delete();
         return response()->json($Publishsboxes);
     }

@@ -10,11 +10,12 @@ use Illuminate\Http\Request;
 
 class BoxesApiController extends Controller
 {
-    public function create(CreateCategoriesApiRequest $request, $id): JsonResponse
+    public function create(CreateCategoriesApiRequest $request): JsonResponse
     {
         $data = $request->all();
         Boxes::create([
             'name' => $data['name'],
+            'user_id' => $request->user()->id,
         ]);
         return response()->json([
             'success' => true,
@@ -23,7 +24,7 @@ class BoxesApiController extends Controller
         ], 201);
     }
 
-    public function read(Request $request, $id): JsonResponse
+    public function read(Request $request): JsonResponse
     {
         $Boxes = Boxes::all();
         return response()->json($Boxes);
