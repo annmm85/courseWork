@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('text');
             $table->foreignId('user_id')->constrained(
-                table: 'users', indexName: 'comment_user_id'
+                table: 'users', indexName: 'comments_user_id'
             );
             $table->foreignId('publish_id')->constrained(
                 table: 'publishs', indexName: 'publish_id'

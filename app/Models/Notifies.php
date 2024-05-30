@@ -18,4 +18,9 @@ class Notifies extends Model
         'link',
         'image',
     ];
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'usernotifies', 'notify_id', 'user_id');
+    }
 }

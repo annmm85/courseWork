@@ -30,6 +30,7 @@ class CategoriesApiController extends Controller
 
         return response()->json($Categories);
     }
+
     public function updateById(Request $request, $id): JsonResponse
     {
         $Categories = Categories::find($id);

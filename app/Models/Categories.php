@@ -16,4 +16,8 @@ class Categories extends Model
     protected $fillable = [
         'name',
     ];
+    public function publishs(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Publishs::class, 'publishs_categories', 'category_id', 'publish_id');
+    }
 }
