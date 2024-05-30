@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\publishs;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\CreatePublishsApiRequest;
 use App\Models\Boxes;
 use App\Models\Categories;

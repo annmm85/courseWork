@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\auth\UserAuthenticationApiController;
 use App\Http\Controllers\auth\UserLoginApiController;
-use App\Http\Controllers\boxes\BoxesApiController;
-use App\Http\Controllers\categories\CategoriesApiController;
-use App\Http\Controllers\comments\CommentsApiController;
-use App\Http\Controllers\notifies\NotifiesApiController;
-use App\Http\Controllers\publishs\PublishsApiController;
+use App\Http\Controllers\BoxesApiController;
+use App\Http\Controllers\CategoriesApiController;
+use App\Http\Controllers\CommentsApiController;
+use App\Http\Controllers\NotifiesApiController;
+use App\Http\Controllers\PublishsApiController;
 use App\Http\Controllers\UserApiController;
 use Illuminate\Support\Facades\Route;
 

@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\boxes;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateCategoriesApiRequest;
 use App\Models\Boxes;
 use Illuminate\Http\JsonResponse;

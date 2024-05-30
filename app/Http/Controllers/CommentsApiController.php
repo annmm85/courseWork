@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\comments;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateCommentsApiRequest;
 use App\Models\Comments;
 use Illuminate\Http\JsonResponse;
