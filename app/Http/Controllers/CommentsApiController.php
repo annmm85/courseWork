@@ -33,18 +33,25 @@ class CommentsApiController extends Controller
     public function updateById(Request $request, $id): JsonResponse
     {
         $Comments = Comments::find($id);
-
-        $Comments->update([
-            'text' => $request->input('text', $Comments->text),
-        ]);
-        $Comments->save();
-        return response()->json($Comments);
+        if ($Comments) {
+            $Comments->update([
+                'text' => $request->input('text', $Comments->text),
+            ]);
+            $Comments->save();
+            return response()->json($Comments);
+        }else{
+            return response()->json(['message' => 'Комментарий не найден'], 404);
+        }
     }
 
     public function deleteById(Request $request, $id): JsonResponse
     {
         $Comments = Comments::find($id);
-        $Comments->delete();
-        return response()->json($Comments);
+        if ($Comments) {
+            $Comments->delete();
+            return response()->json($Comments);
+        }else{
+            return response()->json(['message' => 'Комментарий не найден'], 404);
+        }
     }
 }

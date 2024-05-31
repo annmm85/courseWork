@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserLoginRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
@@ -30,5 +31,17 @@ class UserLoginApiController extends Controller
             'message' => 'Success',
             'token' => $user->createToken('authToken')->plainTextToken,
         ], 201);
+    }
+    public function logout(Request $request): JsonResponse
+    {
+        if($request->user()->tokens()->delete()) {
+            return response()->json([
+                'message' => 'Успешный выход'
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Попробуйте еще раз'
+            ], 500);
+        }
     }
 }

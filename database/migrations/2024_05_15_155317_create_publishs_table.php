@@ -27,7 +27,7 @@ return new class extends Migration
                 table: 'publishs', indexName: 'categories_publish_id'
             );
             $table->foreignId('category_id')->constrained(
-                table: 'categories', indexName: 'category_id'
+                table: 'categories', indexName: 'publishs_category_id'
             );
             $table->timestamps();
         });

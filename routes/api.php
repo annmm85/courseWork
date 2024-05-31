@@ -22,6 +22,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/registration',[UserAuthenticationApiController::class, 'register']);
 Route::post('/login',[UserLoginApiController::class, 'login']);
+Route::post('/logout',[UserLoginApiController::class, 'logout']);
+
+Route::post('/categoryInterest',[CategoriesApiController::class, 'addCategoryInterest'])->middleware('auth:sanctum');
+Route::get('/main',[CategoriesApiController::class, 'mainRead'])->middleware('auth:sanctum');
 
 Route::get('/publishs',[PublishsApiController::class, 'read'])->middleware('auth:sanctum');
 Route::post('/publishs/create',[PublishsApiController::class, 'create'])->middleware('auth:sanctum');
@@ -32,12 +36,12 @@ Route::post('/publishs/search',[PublishsApiController::class, 'searchQueryRead']
 
 
 Route::get('/boxes/{id}/publishs',[PublishsApiController::class, 'boxesRead'])->middleware('auth:sanctum');
-Route::get('/publishs/{id}/boxes',[PublishsApiController::class, 'boxesOnePublishRead'])->middleware('auth:sanctum');
-Route::post('/publishs/{id}',[PublishsApiController::class, 'saveInBox'])->middleware('auth:sanctum');
+Route::get('/publishs/{id}/boxes',[PublishsApiController::class, 'boxesByOnePublishRead'])->middleware('auth:sanctum');
+Route::post('/publishs/{id}/saveInBox',[PublishsApiController::class, 'saveInBox'])->middleware('auth:sanctum');
 Route::delete('boxes/{box_id}/publishs/{id}',[PublishsApiController::class, 'deleteInBox'])->middleware('auth:sanctum');
 
 Route::get('/categories/{id}/publishs',[PublishsApiController::class, 'categoryRead'])->middleware('auth:sanctum');
-Route::get('/publishs/{id}/categories',[PublishsApiController::class, 'categoriesOnePublishRead'])->middleware('auth:sanctum');
+Route::get('/publishs/{id}/categories',[PublishsApiController::class, 'categoriesByOnePublishRead'])->middleware('auth:sanctum');
 Route::post('/publishs/{id}',[PublishsApiController::class, 'addCategory'])->middleware('auth:sanctum');
 Route::delete('categories/{сategory_id}/publishs/{id}',[PublishsApiController::class, 'deleteCategory'])->middleware('auth:sanctum');
 
@@ -70,6 +74,8 @@ Route::get('/users/{id}/notifies',[NotifiesApiController::class, 'readNotifiesBy
 Route::get('/notifies/{id}/users',[NotifiesApiController::class, 'readUserByNotifies'])->middleware('auth:sanctum');
 Route::patch('/notifies/{id}/update',[NotifiesApiController::class, 'updateById'])->middleware('auth:sanctum');
 Route::delete('/notifies/{id}',[NotifiesApiController::class, 'deleteById'])->middleware('auth:sanctum');
+Route::delete('notifies/{id}/user/{user_id}',[NotifiesApiController::class, 'deleteUserByNotifies'])->middleware('auth:sanctum');
+
 
 Route::post('/subscribe',[UserApiController::class, 'subscribe'])->middleware('auth:sanctum');
 Route::get('/subscribes/authors',[UserApiController::class, 'readAuthors'])->middleware('auth:sanctum');

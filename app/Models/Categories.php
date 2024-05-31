@@ -20,4 +20,8 @@ class Categories extends Model
     {
         return $this->belongsToMany(Publishs::class, 'publishs_categories', 'category_id', 'publish_id');
     }
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'users_categories', 'category_id', 'user_id');
+    }
 }

@@ -24,8 +24,22 @@ class CreatePublishsApiRequest extends FormRequest
     {
         return [
             'title' => 'required',
-            'category_id' => 'required',
-            'image' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
+        ];
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'title.required' => 'Название обязательно к заполнению.',
+            'image.required' => 'Изображение обязательно к загрузке.',
+            'image.image' => 'Файл должен быть изображением.',
+            'image.mimes' => 'Изображение должно быть формата jpeg, png, jpg или svg.',
+            'image.max' => 'Изображение не должно превышать размер в 2 МБ.'
         ];
     }
 }

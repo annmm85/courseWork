@@ -16,7 +16,6 @@ class Notifies extends Model
     protected $fillable = [
         'title',
         'link',
-        'image',
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsToMany

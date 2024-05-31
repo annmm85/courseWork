@@ -32,18 +32,25 @@ class BoxesApiController extends Controller
     public function updateById(Request $request, $id): JsonResponse
     {
         $Boxes = Boxes::find($id);
-
-        $Boxes->update([
-            'name' => $request->input('name', $Boxes->name),
-        ]);
-        $Boxes->save();
-        return response()->json($Boxes);
+        if ($Boxes) {
+            $Boxes->update([
+                'name' => $request->input('name', $Boxes->name),
+            ]);
+            $Boxes->save();
+            return response()->json($Boxes);
+        } else {
+            return response()->json(['message' => 'Ящик не найден'], 404);
+        }
     }
 
     public function deleteById(Request $request, $id): JsonResponse
     {
         $Boxes = Boxes::find($id);
-        $Boxes->delete();
-        return response()->json($Boxes);
+        if ($Boxes) {
+            $Boxes->delete();
+            return response()->json($Boxes);
+        } else {
+            return response()->json(['message' => 'Ящик не найден'], 404);
+        }
     }
 }

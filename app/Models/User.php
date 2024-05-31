@@ -68,5 +68,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Notifies::class, 'usernotifies', 'user_id', 'notify_id');
     }
-
+    public function categories(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Categories::class, 'users_categories', 'user_id', 'category_id');
+    }
 }
