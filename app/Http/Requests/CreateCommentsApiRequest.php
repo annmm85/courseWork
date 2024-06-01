@@ -25,4 +25,14 @@ class CreateCommentsApiRequest extends FormRequest
             'text' => 'required',
         ];
     }
+    /**
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'text.required' => 'Текст обязательно к заполнению.',
+        ];
+    }
 }

@@ -19,47 +19,43 @@ class PublishsApiController extends Controller
 
     public function categoryRead(Request $request, $id): JsonResponse
     {
-        if (Categories::find($id)) {
-            return response()->json(Categories::find($id)->publishs()->get());
-        } else {
+        if (!Categories::find($id)) {
             return response()->json(['message' => 'Категория не найдена'], 404);
         }
+        return response()->json(Categories::find($id)->publishs()->get());
     }
 
     public function categoriesByOnePublishRead(Request $request, $id): JsonResponse
     {
-        if (Publishs::find($id)) {
-            return response()->json(Publishs::find($id)->categories()->get());
-        } else {
+        if (!Publishs::find($id)) {
             return response()->json(['message' => 'Публикация не найдена'], 404);
         }
+        return response()->json(Publishs::find($id)->categories()->get());
     }
 
     public function boxesRead(Request $request, $id): JsonResponse
     {
-        if (Boxes::find($id)) {
-            return response()->json(Boxes::find($id)->publishs()->get());
-        } else {
+        if (!Boxes::find($id)) {
             return response()->json(['message' => 'Ящик не найден'], 404);
         }
+        return response()->json(Boxes::find($id)->publishs()->get());
     }
 
     public function boxesByOnePublishRead(Request $request, $id): JsonResponse
     {
-        if (Publishs::find($id)) {
-            return response()->json(Publishs::find($id)->boxes()->get());
-        } else {
+        if (!Publishs::find($id)) {
             return response()->json(['message' => 'Публикация не найдена'], 404);
         }
+        return response()->json(Publishs::find($id)->boxes()->get());
+
     }
 
     public function userRead(Request $request, $id): JsonResponse
     {
-        if (User::find($id)) {
-            return response()->json(User::find($id)->publishs()->get());
-        } else {
+        if (!User::find($id)) {
             return response()->json(['message' => 'Пользователь не найден'], 404);
         }
+        return response()->json(User::find($id)->publishs()->get());
     }
 
     public function authorsRead(Request $request): JsonResponse
@@ -75,6 +71,7 @@ class PublishsApiController extends Controller
         $publishs = Publishs::where('title', 'like', '%' . $searchQuery . '%')
             ->orWhere('desc', 'like', '%' . $searchQuery . '%')
             ->get();
+
         return response()->json($publishs);
     }
 
@@ -92,150 +89,176 @@ class PublishsApiController extends Controller
             'user_id' => $request->user()->id,
         ]);
 
-        if (isset($data['category_id'])) {
-            if (Categories::find($data['category_id'])) {
-                $publication->categories()->attach($data['category_id']);
-                return response()->json(['message' => 'Публикация успешно создана'], 201);
-            } else {
-                return response()->json(['error' => 'Категория не найдена'], 422);
-            }
-        } else {
+        if (!isset($data['category_id'])) {
             return response()->json(['error' => 'Заполните поле категории'], 422);
         }
+        if (!Categories::find($data['category_id'])) {
+            return response()->json(['error' => 'Категория не найдена'], 422);
+        }
+        $publication->categories()->attach($data['category_id']);
+        return response()->json(['message' => 'Публикация успешно создана'], 201);
     }
 
     public function saveInBox(Request $request, $id): JsonResponse
     {
-        if (Publishs::find($id)) {
-            $boxes = Publishs::find($id)->boxes()->pluck('id')->toArray();
-            if (!in_array($request->get('box_id'), $boxes)) {
-                if (Boxes::find($request->get('box_id'))) {
-                    Publishs::find($id)->boxes()->attach($request->get('box_id'));
-                    return response()->json([
-                        'success' => true,
-                        'code' => 201,
-                        'message' => 'Публикация добавлена в ящик',
-                    ], 201);
-                } else {
-                    return response()->json(['error' => 'Ящик не найден'], 404);
-                }
-            } else {
-                return response()->json(['error' => 'Публикация уже есть в ящике'], 404);
-            }
-        } else {
+        $box = Boxes::find($request->get('box_id'));
+        if (!$box) {
+            return response()->json(['error' => 'Ящик не найден'], 404);
+        }
+
+        $user = $request->user();
+        if (!$user->boxes->contains($box)) {
+            return response()->json(['error' => 'Это не ваш ящик'], 404);
+        }
+
+        $publish = Publishs::find($id);
+        if (!$publish) {
             return response()->json(['error' => 'Публикация не найдена'], 404);
         }
+
+        if ($publish->boxes()->where('id', $box->id)->exists()) {
+            return response()->json(['error' => 'Публикация уже есть в ящике'], 404);
+        }
+
+        $publish->boxes()->attach($box);
+        return response()->json([
+            'success' => true,
+            'code' => 201,
+            'message' => 'Публикация добавлена в ящик',
+        ], 201);
     }
 
     public function addCategory(Request $request, $id): JsonResponse
     {
-        if (Publishs::find($id)) {
-            $categories = Publishs::find($id)->categories()->pluck('id')->toArray();
-            if (!in_array($request->get('category_id'), $categories)) {
-                if (Categories::find($request->get('category_id'))) {
-                    Publishs::find($id)->categories()->attach($request->get('category_id'));
-                    return response()->json(['Категория успешно добавлена в категорию'], 201);
-                } else {
-                    return response()->json(['Категория не найдена'], 404);
-                }
-            } else {
-                return response()->json(['Публикация уже прикреплена к категории'], 404);
-            }
-        } else {
-            return response()->json(['Публикация не найдена'], 404);
+        $publishs = Publishs::find($id);
+        if (!$publishs) {
+            return response()->json(['error' => 'Публикация не найдена'], 404);
         }
+
+        if ($request->user()->id !== $publishs->author_id && $request->user()->id !== 1) {
+            return response()->json(['error' => 'Вы не являетесь автором этой публикации/администратором'], 403);
+        }
+
+        $category_id = $request->get('category_id');
+        if ($publishs->categories()->where('id', $category_id)->exists()) {
+            return response()->json(['error' => 'Публикация уже прикреплена к категории'], 404);
+        }
+
+        $category = Categories::find($category_id);
+        if (!$category) {
+            return response()->json(['error' => 'Категория не найдена'], 404);
+        }
+
+        $publishs->categories()->attach($category_id);
+        return response()->json(['message' => 'Категория успешно добавлена в публикацию'], 201);
     }
+
 
     public function updateById(Request $request, $id): JsonResponse
     {
         $publishs = Publishs::find($id);
+        if (!$publishs) {
+            return response()->json(['error' => 'Публикация не найдена'], 404);
+        }
+
+        if ($request->user()->id !== $publishs->author_id && $request->user()->id !== 1) {
+            return response()->json(['error' => 'Вы не являетесь автором этой публикации/администратором'], 403);
+        }
 
         $image = $request->file('image');
-        $pathToImage = $image->store('images', 'public');
-
-        if ($publishs) {
-            $publishs->update([
-                'title' => $request->input('title', $publishs->title),
-                'desc' => $request->input('desc', $publishs->desc),
-                'image' => $request->input($pathToImage, $publishs->image),
-            ]);
-            if (isset($request->box_id)) {
-                $boxes = $publishs->boxes()->pluck('id')->toArray();
-                if (!in_array($request->box_id, $boxes)) {
-                    if (Boxes::find($request->box_id)) {
-                        $publishs->boxes()->update(['box_id' => $request->input('box_id')]);
-                    } else {
-                        return response()->json(['Ящик не найден'], 404);
-                    }
-                } else {
-                    return response()->json(['Публикация уже есть в ящике'], 404);
-                }
-            }
-            if (isset($request->category_id)) {
-                $categories = $publishs->categories()->pluck('id')->toArray();
-                if (!in_array($request->get('category_id'), $categories)) {
-                    if (Categories::find($request->category_id)) {
-                        $publishs->categories()->update(['category_id' => $request->input('category_id')]);
-                    } else {
-                        return response()->json(['Категория не найдена'], 404);
-                    }
-                } else {
-                    return response()->json(['Публикация уже прикреплена к категории'], 404);
-                }
-            }
-            $publishs->save();
-            return response()->json(['message' => 'Публикация успешно изменена'], 201);
-        } else {
-            return response()->json(['Публикация не найдена'], 404);
+        if ($image) {
+            $pathToImage = $image->store('images', 'public');
+            $publishs->image = $pathToImage;
         }
+
+        $publishs->title = $request->input('title', $publishs->title);
+        $publishs->desc = $request->input('desc', $publishs->desc);
+
+        $box_id = $request->input('box_id');
+        if ($box_id && !$publishs->boxes()->where('id', $box_id)->exists()) {
+            $box = Boxes::find($box_id);
+            if (!$box) {
+                return response()->json(['error' => 'Ящик не найден'], 404);
+            }
+            $publishs->boxes()->attach($box_id);
+        }
+
+        $category_id = $request->input('category_id');
+        if ($category_id && !$publishs->categories()->where('id', $category_id)->exists()) {
+            $category = Categories::find($category_id);
+            if (!$category) {
+                return response()->json(['error' => 'Категория не найдена'], 404);
+            }
+            $publishs->categories()->attach($category_id);
+        }
+
+        $publishs->save();
+        return response()->json(['message' => 'Публикация успешно изменена'], 201);
     }
 
     public function deleteById(Request $request, $id): JsonResponse
-    {   $publish = Publishs::find($id);
-        if ($publish) {
-            $publish->categories()->detach();
-            $publish->delete();
-            return response()->json(['message' => 'Публикация успешно удалена'], 201);
-        } else {
-            return response()->json(['Публикация не найдена'], 404);
+    {
+        $publish = Publishs::find($id);
+
+        if (!$publish) {
+            return response()->json(['message' => 'Публикация не найдена'], 404);
         }
+
+        if ($request->user()->id !== $publish->author_id && $request->user()->id !== 1) {
+            return response()->json(['error' => 'Вы не являетесь автором этой публикации/администратором'], 403);
+        }
+
+        $publish->categories()->detach();
+        $publish->delete();
+
+        return response()->json(['message' => 'Публикация успешно удалена'], 201);
     }
 
     public function deleteInBox(Request $request, $box_id, $id): JsonResponse
     {
-        if (Boxes::find($box_id)) {
-            if (Publishs::find($id)) {
-                $idPublishsInBox = Boxes::find($box_id)->publishs()->pluck('id')->toArray();
-                if (in_array($id, $idPublishsInBox)) {
-                    Publishs::find($id)->boxes()->detach($box_id);
-                    return response()->json(['message' => 'Публикация успешно удалена из ящика'], 201);
-                } else {
-                    return response()->json(['В ящике не найдена публикация'], 404);
-                }
-            } else {
-                return response()->json(['Публикация не найдена'], 404);
-            }
-        } else {
-            return response()->json(['Ящик не найден'], 404);
+        $box = Boxes::find($box_id);
+        $publish = Publishs::find($id);
+
+        if (!$box) {
+            return response()->json(['message' => 'Ящик не найден'], 404);
         }
+
+        if (!$publish) {
+            return response()->json(['message' => 'Публикация не найдена'], 404);
+        }
+
+        if (!$box->publishs->contains($id)) {
+            return response()->json(['message' => 'В ящике не найдена публикация'], 404);
+        }
+
+        $publish->boxes()->detach($box_id);
+
+        return response()->json(['message' => 'Публикация успешно удалена из ящика'], 200);
     }
 
     public function deleteCategory(Request $request, $category_id, $id): JsonResponse
     {
-        if (Categories::find($category_id)) {
-            if (Publishs::find($id)) {
-                $idPublishsWithCategories = Categories::find($category_id)->publishs()->pluck('id')->toArray();
-                if (in_array($id, $idPublishsWithCategories)) {
-                    Publishs::find($id)->categories()->detach($category_id);
-                    return response()->json(['message' => 'Категория успешна удалена из публикации'], 201);
-                } else {
-                    return response()->json(['У публикации нет такой категории'], 404);
-                }
-            } else {
-                return response()->json(['Публикация не найдена'], 404);
-            }
-        } else {
-            return response()->json(['Категория не найдена'], 404);
+        $category = Categories::find($category_id);
+        $publish = Publishs::find($id);
+
+        if (!$category) {
+            return response()->json(['error' => 'Категория не найдена'], 404);
         }
+
+        if (!$publish) {
+            return response()->json(['error' => 'Публикация не найдена'], 404);
+        }
+
+        if (!$publish->categories->contains($category_id)) {
+            return response()->json(['error' => 'У публикации нет такой категории'], 404);
+        }
+
+        if ($publish->categories()->count() <= 1) {
+            return response()->json(['error' => 'Нельзя удалить последнюю категорию публикации'], 400);
+        }
+
+        $publish->categories()->detach($category_id);
+
+        return response()->json(['message' => 'Категория успешно удалена из публикации'], 200);
     }
 }

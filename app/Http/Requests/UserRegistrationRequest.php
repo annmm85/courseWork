@@ -26,4 +26,18 @@ class UserRegistrationRequest extends FormRequest
             'password' => 'required',
         ];
     }
+    /**
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'name.required' => 'Название обязательно к заполнению.',
+            'email.required' => 'Почта обязательна к заполнению.',
+            'email.email' => 'Почта некорректна.',
+            'email.unique' => 'Такая почта уже зарегистрирована.',
+            'password.required' => 'Пароль обязателен к заполнению.',
+        ];
+    }
 }

@@ -26,4 +26,15 @@ class CreateNotifiesApiRequest extends FormRequest
             'link' => 'required',
         ];
     }
+    /**
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'title.required' => 'Название обязательно к заполнению.',
+            'link.required' => 'Ссылка обязательна к заполнению.'
+        ];
+    }
 }

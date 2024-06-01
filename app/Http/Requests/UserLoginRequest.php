@@ -26,4 +26,16 @@ class UserLoginRequest extends FormRequest
             'password' => 'required',
         ];
     }
+    /**
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'email.required' => 'Почта обязательна к заполнению.',
+            'email.email' => 'Почта некорректна.',
+            'password.required' => 'Пароль обязателен к заполнению.',
+        ];
+    }
 }

@@ -34,7 +34,6 @@ Route::delete('/publishs/{id}',[PublishsApiController::class, 'deleteById'])->mi
 
 Route::post('/publishs/search',[PublishsApiController::class, 'searchQueryRead'])->middleware('auth:sanctum');
 
-
 Route::get('/boxes/{id}/publishs',[PublishsApiController::class, 'boxesRead'])->middleware('auth:sanctum');
 Route::get('/publishs/{id}/boxes',[PublishsApiController::class, 'boxesByOnePublishRead'])->middleware('auth:sanctum');
 Route::post('/publishs/{id}/saveInBox',[PublishsApiController::class, 'saveInBox'])->middleware('auth:sanctum');

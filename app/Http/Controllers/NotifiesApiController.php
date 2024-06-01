@@ -23,20 +23,19 @@ class NotifiesApiController extends Controller
             'message' => 'Уведомление создано',
         ], 201);
     }
+
     public function bindUser(Request $request, $id): JsonResponse
     {
         $notifies = Notifies::find($id);
         $users = User::find($request->get('user_id'));
-        if($users){
-            if($notifies) {
-                $notifies->user()->attach($request->get('user_id'));
-                return response()->json(['Уведомление успешно добавлено пользователю'], 201);
-            }else{
-                return response()->json(['message' => 'Уведомление не найдено'], 404);
-            }
-        }else{
+        if (!$users) {
             return response()->json(['message' => 'Пользователь не найден'], 404);
         }
+        if (!$notifies) {
+            return response()->json(['message' => 'Уведомление не найдено'], 404);
+        }
+        $notifies->user()->attach($request->get('user_id'));
+        return response()->json(['Уведомление успешно добавлено пользователю'], 201);
     }
 
     public function read(Request $request): JsonResponse
@@ -44,65 +43,69 @@ class NotifiesApiController extends Controller
         $Notifies = Notifies::all();
         return response()->json($Notifies);
     }
+
     public function readNotifiesByUser(Request $request, $id): JsonResponse
     {
         $user = User::find($id);
-        if ($user) {
-            $notifies = $user->notifies()->get();
-            return response()->json($notifies);
-        } else {
+        if (!$user) {
             return response()->json(['message' => 'Пользователь не найден'], 404);
         }
+        $notifies = $user->notifies()->get();
+        return response()->json($notifies);
     }
+
     public function readUserByNotifies(Request $request, $id): JsonResponse
     {
         $notifies = Notifies::find($id);
-        if ($notifies) {
-            $users = $notifies->user()->get();
-            return response()->json($users);
-        }else {
+        if (!$notifies) {
             return response()->json(['message' => 'Уведомление не найдено'], 404);
+
         }
+        $users = $notifies->user()->get();
+        return response()->json($users);
     }
+
     public function updateById(Request $request, $id): JsonResponse
     {
         $Notifies = Notifies::find($id);
-        if ($Notifies) {
-            $Notifies->update([
-                'title' => $request->input('title', $Notifies->title),
-                'link' => $request->input('link', $Notifies->link),
-            ]);
-            if (isset($request->user_id)) {
-                $Notifies->user()->update(['user_id' => $request->input('user_id')]);
-            }
-            $Notifies->save();
-            return response()->json($Notifies);
-        } else {
+        if (!$Notifies) {
             return response()->json(['message' => 'Уведомление не найдено'], 404);
         }
+        $Notifies->update([
+            'title' => $request->input('title', $Notifies->title),
+            'link' => $request->input('link', $Notifies->link),
+        ]);
+        if (isset($request->user_id)) {
+            if (!User::find($request->input('user_id'))) {
+                return response()->json(['message' => 'Пользователь не найден'], 404);
+            }
+            $Notifies->user()->update(['user_id' => $request->input('user_id')]);
+        }
+        $Notifies->save();
+        return response()->json($Notifies);
     }
+
     public function deleteById(Request $request, $id): JsonResponse
     {
         $Notifies = Notifies::find($id);
-        if ($Notifies) {
-        $Notifies->delete();
-        return response()->json($Notifies);
-        } else {
+        if (!$Notifies) {
             return response()->json(['message' => 'Уведомление не найдено'], 404);
         }
+        $Notifies->delete();
+        return response()->json($Notifies);
     }
+
     public function deleteUserByNotifies(Request $request, $id, $user_id): JsonResponse
     {
         $Notifies = Notifies::find($id);
-        if ($Notifies) {
-            if ($Notifies->user()->pluck('id')[0] == $user_id) {
-                $Notifies->user()->detach($user_id);
-                return response()->json(['Уведомление успешно удалено у пользователя'], 201);
-            }else {
-                return response()->json(['message' => 'Уведомление у этого пользователя не найдено'], 404);
-            }
-        }else {
-                return response()->json(['message' => 'Уведомление не найдено'], 404);
+        if (!$Notifies) {
+            return response()->json(['message' => 'Уведомление не найдено'], 404);
         }
+        if ($Notifies->user()->pluck('id')[0] !== $user_id) {
+            return response()->json(['message' => 'Уведомление у этого пользователя не найдено'], 404);
+        }
+        $Notifies->user()->detach($user_id);
+        return response()->json(['Уведомление успешно удалено у пользователя'], 201);
+
     }
 }

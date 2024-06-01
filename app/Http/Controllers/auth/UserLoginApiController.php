@@ -21,7 +21,7 @@ class UserLoginApiController extends Controller
         $user = User::where('email', $request->get('email'))->first();
         if (!$user || !Hash::check($request->get('password'), $user->password)) {
             return response()->json([
-                'message' => ['Email or password incorrect.'],
+                'message' => ['Почта или пароль некорректны.'],
             ]);
         }
         $user->tokens()->delete();

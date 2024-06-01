@@ -25,4 +25,14 @@ class CreateCategoriesApiRequest extends FormRequest
             'name' => 'required',
         ];
     }
+    /**
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'name.required' => 'Название обязательно к заполнению.',
+        ];
+    }
 }
