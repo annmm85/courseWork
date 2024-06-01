@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 
 class UserApiController extends Controller
 {
+
 //    создание пользователя - регистрация уже создана
     public function subscribe(Request $request): JsonResponse
     {

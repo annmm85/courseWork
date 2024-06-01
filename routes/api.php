@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/registration',[UserAuthenticationApiController::class, 'register']);
 Route::post('/login',[UserLoginApiController::class, 'login']);
-Route::post('/logout',[UserLoginApiController::class, 'logout']);
+Route::get('/logout',[UserAuthenticationApiController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::post('/categoryInterest',[CategoriesApiController::class, 'addCategoryInterest'])->middleware('auth:sanctum');
 Route::get('/main',[CategoriesApiController::class, 'mainRead'])->middleware('auth:sanctum');

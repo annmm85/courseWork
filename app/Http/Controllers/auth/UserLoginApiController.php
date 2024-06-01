@@ -19,29 +19,22 @@ class UserLoginApiController extends Controller
     public function login(UserLoginRequest $request): JsonResponse
     {
         $user = User::where('email', $request->get('email'))->first();
+
         if (!$user || !Hash::check($request->get('password'), $user->password)) {
             return response()->json([
-                'message' => ['Почта или пароль некорректны.'],
-            ]);
+                'message' => 'Почта или пароль некорректны.'
+            ], 422);
         }
+
         $user->tokens()->delete();
+
         return response()->json([
             'success' => true,
-            'code' => 201,
             'message' => 'Success',
-            'token' => $user->createToken('authToken')->plainTextToken,
-        ], 201);
+            'token' => $user->createToken('authToken')->plainTextToken
+        ]);
     }
-    public function logout(Request $request): JsonResponse
-    {
-        if($request->user()->tokens()->delete()) {
-            return response()->json([
-                'message' => 'Успешный выход'
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => 'Попробуйте еще раз'
-            ], 500);
-        }
-    }
+
+
+
 }
