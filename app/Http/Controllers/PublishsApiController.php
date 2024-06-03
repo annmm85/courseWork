@@ -9,6 +9,8 @@ use App\Models\Publishs;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PublishsApiController extends Controller
 {
@@ -68,11 +70,22 @@ class PublishsApiController extends Controller
     public function searchQueryRead(Request $request)
     {
         $searchQuery = $request->input('searchQuery');
-        $publishs = Publishs::where('title', 'like', '%' . $searchQuery . '%')
+        $publishs = Publishs::with('categories') // Загрузка отношения categories
+        ->where('title', 'like', '%' . $searchQuery . '%')
             ->orWhere('desc', 'like', '%' . $searchQuery . '%')
             ->get();
 
+        $categories = $publishs->flatMap(function ($publish) {
+            return $publish->categories;
+        })->pluck('id')->countBy();
+
+        $mostPopularCategoryId = $categories->sortDesc()->keys()->first();
+
+        $mostPopularCategory = Categories::find($mostPopularCategoryId);
+        User::find($request->user()->id)->categories()->attach($mostPopularCategory->id);
+
         return response()->json($publishs);
+
     }
 
     public function create(CreatePublishsApiRequest $request): JsonResponse
@@ -127,7 +140,31 @@ class PublishsApiController extends Controller
             'message' => 'Публикация добавлена в ящик',
         ], 201);
     }
+    public function saveInLoves(Request $request, $id): JsonResponse
+    {
+        $userLovesBox = User::find($request->user()->id)->boxes->where('name', 'loves')->first();
+        if (!$userLovesBox) {
+            $userLovesBox = Boxes::create([
+                'name' => 'loves',
+                'user_id' => $request->user()->id,
+            ]);
+        }
+        $publish = Publishs::find($id);
+        if (!$publish) {
+            return response()->json(['error' => 'Публикация не найдена'], 404);
+        }
 
+        if ($publish->boxes()->where('id', $userLovesBox->id)->exists()) {
+            return response()->json(['error' => 'Публикация уже есть в ящике'], 404);
+        }
+
+        $publish->boxes()->attach($userLovesBox);
+        return response()->json([
+            'success' => true,
+            'code' => 201,
+            'message' => 'Публикация добавлена в ящикe Понравившиеся',
+        ], 201);
+    }
     public function addCategory(Request $request, $id): JsonResponse
     {
         $publishs = Publishs::find($id);
@@ -152,7 +189,19 @@ class PublishsApiController extends Controller
         $publishs->categories()->attach($category_id);
         return response()->json(['message' => 'Категория успешно добавлена в публикацию'], 201);
     }
+//
+    public function downloadImage(Request $request, $id): BinaryFileResponse{
+        $publishs = Publishs::find($id);
+        if (!$publishs) {
+            abort(404, 'Публикация не найдена.');
+        }
 
+        $imagePath = $publishs->image; // Убедитесь, что это путь к файлу изображения
+        if (Storage::exists($imagePath)) {
+            abort(404, 'Изображение не найдено.');
+        }
+        return response()->download(storage_path('app/public/' . $imagePath));
+    }
 
     public function updateById(Request $request, $id): JsonResponse
     {

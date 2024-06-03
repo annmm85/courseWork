@@ -47,6 +47,7 @@ class CategoriesApiController extends Controller
             $authors_publishs = Publishs::whereIn('user_id', $user->authors()->get()->pluck('id'))->get()->toArray();
             $interestPublishs = array_merge($interestPublishs, $authors_publishs);
         }
+
         return response()->json($interestPublishs);
     }
 

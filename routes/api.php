@@ -26,13 +26,13 @@ Route::post('/login',[UserLoginApiController::class, 'login']);
 Route::get('/logout',[UserAuthenticationApiController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::get('/users/roles/{id}',[UserApiController::class, 'readUsersByRole'])->middleware(['auth:sanctum','admin']);
-Route::patch('/users/{id}/updateRole',[UserApiController::class, 'updateRoleById'])->middleware(['auth:sanctum','admin']);
+Route::patch('/users/{id}/update-role',[UserApiController::class, 'updateRoleById'])->middleware(['auth:sanctum','admin']);
 
 Route::get('/main',[CategoriesApiController::class, 'mainRead'])->middleware('auth:sanctum');
 
-Route::get('/categoryInterest',[InterestCategoriesApiController::class, 'readInterestCategory'])->middleware('auth:sanctum');
-Route::post('/categoryInterest/add',[InterestCategoriesApiController::class, 'addCategoryInterest'])->middleware('auth:sanctum');
-Route::delete('/categoryInterest/{id}',[InterestCategoriesApiController::class, 'deleteByIdCategoryInterest'])->middleware('auth:sanctum');
+Route::get('/category-interest',[InterestCategoriesApiController::class, 'readInterestCategory'])->middleware('auth:sanctum');
+Route::post('/category-interest/add',[InterestCategoriesApiController::class, 'addCategoryInterest'])->middleware('auth:sanctum');
+Route::delete('/category-interest/{id}',[InterestCategoriesApiController::class, 'deleteByIdCategoryInterest'])->middleware('auth:sanctum');
 
 Route::get('/publishs',[PublishsApiController::class, 'read'])->middleware('auth:sanctum');
 Route::post('/publishs/create',[PublishsApiController::class, 'create'])->middleware('auth:sanctum');
@@ -40,10 +40,12 @@ Route::patch('/publishs/{id}',[PublishsApiController::class, 'updateById'])->mid
 Route::delete('/publishs/{id}',[PublishsApiController::class, 'deleteById'])->middleware('auth:sanctum');
 
 Route::post('/publishs/search',[PublishsApiController::class, 'searchQueryRead'])->middleware('auth:sanctum');
+Route::get('/publishs/{id}/download',[PublishsApiController::class, 'downloadImage'])->middleware('auth:sanctum');
 
 Route::get('/boxes/{id}/publishs',[PublishsApiController::class, 'boxesRead'])->middleware('auth:sanctum');
 Route::get('/publishs/{id}/boxes',[PublishsApiController::class, 'boxesByOnePublishRead'])->middleware('auth:sanctum');
-Route::post('/publishs/{id}/saveInBox',[PublishsApiController::class, 'saveInBox'])->middleware('auth:sanctum');
+Route::post('/publishs/{id}/save-in-box',[PublishsApiController::class, 'saveInBox'])->middleware('auth:sanctum');
+Route::post('/publishs/{id}/save-in-loves',[PublishsApiController::class, 'saveInLoves'])->middleware('auth:sanctum');
 Route::delete('boxes/{box_id}/publishs/{id}',[PublishsApiController::class, 'deleteInBox'])->middleware('auth:sanctum');
 
 Route::get('/categories/{id}/publishs',[PublishsApiController::class, 'categoryRead'])->middleware('auth:sanctum');
