@@ -16,7 +16,7 @@ class CategoriesApiController extends Controller
         $data = $request->all();
 
         Categories::create([
-            'name' => $data['name']
+            'name' => $data['name'],
         ]);
 
         return response()->json([
@@ -26,31 +26,12 @@ class CategoriesApiController extends Controller
         ], 201);
     }
 
-
-    public function addCategoryInterest(Request $request): JsonResponse
-    {
-        $userCategories = User::find($request->user()->id)->categories();
-        if (!isset($data['category_id'])) {
-            return response()->json(['error' => 'Заполните поле категории'], 422);
-        }
-        if (!Categories::find($request->get('category_id'))) {
-            return response()->json(['Категория не найдена'], 404);
-        }
-        $categories = $userCategories->pluck('id')->toArray();
-        if (in_array($request->get('category_id'), $categories)) {
-            return response()->json(['Категория уже добавлена в интересующие'], 404);
-        }
-        $userCategories->attach($request->get('category_id'));
-        return response()->json(['Категория успешно добавлена в интересующие'], 201);
-    }
-
     public function read(): JsonResponse
     {
         $Categories = Categories::all();
 
         return response()->json($Categories);
     }
-
     public function mainRead(Request $request): JsonResponse
     {
         $interestPublishs = [];
@@ -72,7 +53,6 @@ class CategoriesApiController extends Controller
     public function updateById(Request $request, $id): JsonResponse
     {
         $Categories = Categories::find($id);
-
         if (!$Categories) {
             return response()->json(['message' => 'Категория не найдена'], 404);
         }
@@ -86,10 +66,10 @@ class CategoriesApiController extends Controller
     public function deleteById(Request $request, $id): JsonResponse
     {
         $Categories = Categories::find($id);
-        if ($Categories) {
+        if (!$Categories) {
             return response()->json(['message' => 'Категория не найдена'], 404);
         }
         $Categories->delete();
-        return response()->json($Categories);
+        return response()->json(['Категория успешно удалена'], 201);
     }
 }

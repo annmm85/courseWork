@@ -5,6 +5,7 @@ use App\Http\Controllers\auth\UserLoginApiController;
 use App\Http\Controllers\BoxesApiController;
 use App\Http\Controllers\CategoriesApiController;
 use App\Http\Controllers\CommentsApiController;
+use App\Http\Controllers\InterestCategoriesApiController;
 use App\Http\Controllers\NotifiesApiController;
 use App\Http\Controllers\PublishsApiController;
 use App\Http\Controllers\UserApiController;
@@ -24,8 +25,14 @@ Route::post('/registration',[UserAuthenticationApiController::class, 'register']
 Route::post('/login',[UserLoginApiController::class, 'login']);
 Route::get('/logout',[UserAuthenticationApiController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::post('/categoryInterest',[CategoriesApiController::class, 'addCategoryInterest'])->middleware('auth:sanctum');
+Route::get('/users/roles/{id}',[UserApiController::class, 'readUsersByRole'])->middleware(['auth:sanctum','admin']);
+Route::patch('/users/{id}/updateRole',[UserApiController::class, 'updateRoleById'])->middleware(['auth:sanctum','admin']);
+
 Route::get('/main',[CategoriesApiController::class, 'mainRead'])->middleware('auth:sanctum');
+
+Route::get('/categoryInterest',[InterestCategoriesApiController::class, 'readInterestCategory'])->middleware('auth:sanctum');
+Route::post('/categoryInterest/add',[InterestCategoriesApiController::class, 'addCategoryInterest'])->middleware('auth:sanctum');
+Route::delete('/categoryInterest/{id}',[InterestCategoriesApiController::class, 'deleteByIdCategoryInterest'])->middleware('auth:sanctum');
 
 Route::get('/publishs',[PublishsApiController::class, 'read'])->middleware('auth:sanctum');
 Route::post('/publishs/create',[PublishsApiController::class, 'create'])->middleware('auth:sanctum');
@@ -76,7 +83,7 @@ Route::delete('/notifies/{id}',[NotifiesApiController::class, 'deleteById'])->mi
 Route::delete('notifies/{id}/user/{user_id}',[NotifiesApiController::class, 'deleteUserByNotifies'])->middleware('auth:sanctum');
 
 
-Route::post('/subscribe',[UserApiController::class, 'subscribe'])->middleware('auth:sanctum');
+Route::post('/subscribe/authors/{id}',[UserApiController::class, 'subscribe'])->middleware('auth:sanctum');
 Route::get('/subscribes/authors',[UserApiController::class, 'readAuthors'])->middleware('auth:sanctum');
 Route::get('/subscribes/subscribers',[UserApiController::class, 'readSubscribers'])->middleware('auth:sanctum');
 Route::delete('/unsubscribes/authors/{id}',[UserApiController::class, 'unsubscribe'])->middleware('auth:sanctum');

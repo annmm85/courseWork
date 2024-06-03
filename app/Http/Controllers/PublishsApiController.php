@@ -136,7 +136,7 @@ class PublishsApiController extends Controller
         }
 
         if ($request->user()->id !== $publishs->author_id && $request->user()->id !== 1) {
-            return response()->json(['error' => 'Вы не являетесь автором этой публикации/администратором'], 403);
+            return response()->json(['error' => 'Вы не являетесь автором/администратором этой публикации'], 403);
         }
 
         $category_id = $request->get('category_id');
@@ -162,7 +162,7 @@ class PublishsApiController extends Controller
         }
 
         if ($request->user()->id !== $publishs->author_id && $request->user()->id !== 1) {
-            return response()->json(['error' => 'Вы не являетесь автором этой публикации/администратором'], 403);
+            return response()->json(['error' => 'Вы не являетесь автором/администратором этой публикации'], 403);
         }
 
         $image = $request->file('image');
@@ -205,7 +205,7 @@ class PublishsApiController extends Controller
         }
 
         if ($request->user()->id !== $publish->author_id && $request->user()->id !== 1) {
-            return response()->json(['error' => 'Вы не являетесь автором этой публикации/администратором'], 403);
+            return response()->json(['error' => 'Вы не являетесь автором/администратором этой публикации'], 403);
         }
 
         $publish->categories()->detach();
@@ -259,6 +259,6 @@ class PublishsApiController extends Controller
 
         $publish->categories()->detach($category_id);
 
-        return response()->json(['message' => 'Категория успешно удалена из публикации'], 200);
+        return response()->json(['message' => 'Категория успешно удалена из публикации'], 201);
     }
 }

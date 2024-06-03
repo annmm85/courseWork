@@ -33,6 +33,9 @@ class BoxesApiController extends Controller
     {
         $Boxes = Boxes::find($id);
         if ($Boxes) {
+            if ($request->user()->id !== $Boxes->user_id && $request->user()->id !== 1) {
+                return response()->json(['error' => 'Вы не являетесь автором/администратором этого ящика'], 403);
+            }
             $Boxes->update([
                 'name' => $request->input('name', $Boxes->name),
             ]);

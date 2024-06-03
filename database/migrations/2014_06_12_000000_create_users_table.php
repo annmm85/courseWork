@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('role_id');
             $table->rememberToken();
             $table->timestamps();
         });
@@ -33,7 +34,7 @@ return new class extends Migration
         Schema::create('users_categories', function (Blueprint $table) {
             $table->primary(['user_id', 'category_id']);
             $table->foreignId('user_id')->constrained(
-                table: 'users', indexName: 'categories_user_id'
+                table: 'users', indexName: 'interestcategories_user_id'
             );
             $table->foreignId('category_id')->constrained(
                 table: 'categories', indexName: 'category_id'

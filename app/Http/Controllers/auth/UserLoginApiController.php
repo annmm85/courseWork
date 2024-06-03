@@ -34,7 +34,4 @@ class UserLoginApiController extends Controller
             'token' => $user->createToken('authToken')->plainTextToken
         ]);
     }
-
-
-
 }

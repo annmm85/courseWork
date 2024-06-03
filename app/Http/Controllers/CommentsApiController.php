@@ -34,6 +34,9 @@ class CommentsApiController extends Controller
     {
         $Comments = Comments::find($id);
         if ($Comments) {
+            if ($request->user()->id !== $Comments->user_id) {
+                return response()->json(['error' => 'Вы не являетесь автором этого комментария'], 403);
+            }
             $Comments->update([
                 'text' => $request->input('text', $Comments->text),
             ]);
