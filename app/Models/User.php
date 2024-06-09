@@ -73,4 +73,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Categories::class, 'users_categories', 'user_id', 'category_id');
     }
+    public function roles(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->BelongsTo(Roles::class);
+    }
 }
