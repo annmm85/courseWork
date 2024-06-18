@@ -17,11 +17,7 @@ class CommentsApiController extends Controller
             'user_id' => $request->user()->id,
             'publish_id' => $id,
         ]);
-        return response()->json([
-            'success' => true,
-            'code' => 201,
-            'message' => 'Комментарий создан',
-        ], 201);
+        return response()->json(['message' => 'Комментарий создан'], 201);
     }
 
     public function read(Request $request, $id): JsonResponse

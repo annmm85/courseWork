@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Categories;
+use App\Models\Publishs;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -49,4 +49,20 @@ class InterestCategoriesApiController extends Controller
         return response()->json(['Категория успешно удалена из интересующих'], 201);
     }
 
+    public function mainRead(Request $request): JsonResponse
+    {
+        $interestPublishs = [];
+        $user = User::find($request->user()->id);
+        $idInterestCategories = $user->categories()->pluck('id');
+
+        foreach ($idInterestCategories as $category) {
+            $publishs = Categories::find($category)->publishs()->get();
+            array_push($interestPublishs, $publishs);
+        }
+        if ($user->authors()) {
+            $authors_publishs = Publishs::whereIn('user_id', $user->authors()->get()->pluck('id'))->get()->toArray();
+            $interestPublishs = array_merge($interestPublishs, $authors_publishs);
+        }
+        return response()->json($interestPublishs);
+    }
 }

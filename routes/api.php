@@ -28,18 +28,18 @@ Route::get('/logout',[UserAuthenticationApiController::class, 'logout'])->middle
 Route::get('/users/roles/{id}',[UserApiController::class, 'readUsersByRole'])->middleware(['auth:sanctum','admin']);
 Route::patch('/users/{id}/update-role',[UserApiController::class, 'updateRoleById'])->middleware(['auth:sanctum','admin']);
 
-Route::get('/main',[CategoriesApiController::class, 'mainRead'])->middleware('auth:sanctum');
+Route::get('/main',[InterestCategoriesApiController::class, 'mainRead'])->middleware('auth:sanctum');
 
 Route::get('/category-interest',[InterestCategoriesApiController::class, 'readInterestCategory'])->middleware('auth:sanctum');
 Route::post('/category-interest/add',[InterestCategoriesApiController::class, 'addCategoryInterest'])->middleware('auth:sanctum');
 Route::delete('/category-interest/{id}',[InterestCategoriesApiController::class, 'deleteByIdCategoryInterest'])->middleware('auth:sanctum');
 
-Route::get('/publishs',[PublishsApiController::class, 'read'])->middleware('auth:sanctum');
+Route::get('/publishs',[PublishsApiController::class, 'read']);
 Route::post('/publishs/create',[PublishsApiController::class, 'create'])->middleware('auth:sanctum');
 Route::patch('/publishs/{id}',[PublishsApiController::class, 'updateById'])->middleware('auth:sanctum');
 Route::delete('/publishs/{id}',[PublishsApiController::class, 'deleteById'])->middleware('auth:sanctum');
 
-Route::post('/publishs/search',[PublishsApiController::class, 'searchQueryRead'])->middleware('auth:sanctum');
+Route::match(['post', 'get'], '/publishs/search', [PublishsApiController::class, 'searchQueryRead'])->middleware('auth:sanctum');
 Route::get('/publishs/{id}/download',[PublishsApiController::class, 'downloadImage'])->middleware('auth:sanctum');
 
 Route::get('/boxes/{id}/publishs',[PublishsApiController::class, 'boxesRead'])->middleware('auth:sanctum');
@@ -71,6 +71,7 @@ Route::delete('/comments/{id}',[CommentsApiController::class, 'deleteById'])->mi
 
 Route::post('/boxes/create',[BoxesApiController::class, 'create'])->middleware('auth:sanctum');
 Route::get('/boxes',[BoxesApiController::class, 'read'])->middleware('auth:sanctum');
+Route::get('user/boxes',[BoxesApiController::class, 'readByUser'])->middleware('auth:sanctum');
 Route::patch('/boxes/{id}',[BoxesApiController::class, 'updateById'])->middleware('auth:sanctum');
 Route::delete('/boxes/{id}',[BoxesApiController::class, 'deleteById'])->middleware('auth:sanctum');
 

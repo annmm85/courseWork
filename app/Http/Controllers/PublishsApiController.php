@@ -18,7 +18,6 @@ class PublishsApiController extends Controller
     {
         return response()->json(Publishs::all());
     }
-
     public function categoryRead(Request $request, $id): JsonResponse
     {
         if (!Categories::find($id)) {
@@ -67,25 +66,27 @@ class PublishsApiController extends Controller
         return response()->json($publishs);
     }
 
-    public function searchQueryRead(Request $request)
+    public function searchQueryRead(Request $request): JsonResponse
     {
         $searchQuery = $request->input('searchQuery');
         $publishs = Publishs::with('categories') // Загрузка отношения categories
         ->where('title', 'like', '%' . $searchQuery . '%')
             ->orWhere('desc', 'like', '%' . $searchQuery . '%')
             ->get();
+        if (trim($searchQuery) != '') {
+            $categories = $publishs->flatMap(function ($publish) {
+                return $publish->categories;
+            })->pluck('id')->countBy();
 
-        $categories = $publishs->flatMap(function ($publish) {
-            return $publish->categories;
-        })->pluck('id')->countBy();
+            $mostPopularCategoryId = $categories->sortDesc()->keys()->first();
 
-        $mostPopularCategoryId = $categories->sortDesc()->keys()->first();
-
-        $mostPopularCategory = Categories::find($mostPopularCategoryId);
-        User::find($request->user()->id)->categories()->attach($mostPopularCategory->id);
-
+            $mostPopularCategory = Categories::find($mostPopularCategoryId);
+            $userCategories = User::find($request->user()->id)->categories->pluck('id');
+            if (!$userCategories->contains($mostPopularCategoryId)) {
+                User::find($request->user()->id)->categories()->attach($mostPopularCategory->id);
+            }
+        }
         return response()->json($publishs);
-
     }
 
     public function create(CreatePublishsApiRequest $request): JsonResponse
@@ -134,11 +135,7 @@ class PublishsApiController extends Controller
         }
 
         $publish->boxes()->attach($box);
-        return response()->json([
-            'success' => true,
-            'code' => 201,
-            'message' => 'Публикация добавлена в ящик',
-        ], 201);
+        return response()->json(['message' => 'Публикация добавлена в ящик'], 201);
     }
     public function saveInLoves(Request $request, $id): JsonResponse
     {
@@ -189,7 +186,7 @@ class PublishsApiController extends Controller
         $publishs->categories()->attach($category_id);
         return response()->json(['message' => 'Категория успешно добавлена в публикацию'], 201);
     }
-//
+
     public function downloadImage(Request $request, $id): BinaryFileResponse{
         $publishs = Publishs::find($id);
         if (!$publishs) {
@@ -210,7 +207,7 @@ class PublishsApiController extends Controller
             return response()->json(['error' => 'Публикация не найдена'], 404);
         }
 
-        if ($request->user()->id !== $publishs->author_id && $request->user()->id !== 1) {
+        if ($request->user()->id !== $publishs->user_id && $request->user()->id !== 1) {
             return response()->json(['error' => 'Вы не являетесь автором/администратором этой публикации'], 403);
         }
 
@@ -253,7 +250,7 @@ class PublishsApiController extends Controller
             return response()->json(['message' => 'Публикация не найдена'], 404);
         }
 
-        if ($request->user()->id !== $publish->author_id && $request->user()->id !== 1) {
+        if ($request->user()->id !== $publish->user_id && $request->user()->id !== 1) {
             return response()->json(['error' => 'Вы не являетесь автором/администратором этой публикации'], 403);
         }
 

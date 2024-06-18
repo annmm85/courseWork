@@ -17,11 +17,7 @@ class NotifiesApiController extends Controller
             'title' => $data['title'],
             'link' => $data['link'],
         ]);
-        return response()->json([
-            'success' => true,
-            'code' => 201,
-            'message' => 'Уведомление создано',
-        ], 201);
+        return response()->json(['message' => 'Уведомление создано'], 201);
     }
 
     public function bindUser(Request $request, $id): JsonResponse

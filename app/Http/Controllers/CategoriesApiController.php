@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateCategoriesApiRequest;
 use App\Models\Categories;
-use App\Models\Publishs;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -19,11 +17,7 @@ class CategoriesApiController extends Controller
             'name' => $data['name'],
         ]);
 
-        return response()->json([
-            'success' => true,
-            'code' => 201,
-            'message' => 'Success',
-        ], 201);
+        return response()->json(['message' => 'Категория успешно создана'], 201);
     }
 
     public function read(): JsonResponse
@@ -32,25 +26,6 @@ class CategoriesApiController extends Controller
 
         return response()->json($Categories);
     }
-    public function mainRead(Request $request): JsonResponse
-    {
-        $interestPublishs = [];
-        $user = User::find($request->user()->id);
-        $idInterestCategories = $user->categories()->pluck('id');
-
-        foreach ($idInterestCategories as $category) {
-            $publishs = Categories::find($category)->publishs()->get();
-            array_push($interestPublishs, $publishs);
-        }
-
-        if ($user->authors()) {
-            $authors_publishs = Publishs::whereIn('user_id', $user->authors()->get()->pluck('id'))->get()->toArray();
-            $interestPublishs = array_merge($interestPublishs, $authors_publishs);
-        }
-
-        return response()->json($interestPublishs);
-    }
-
     public function updateById(Request $request, $id): JsonResponse
     {
         $Categories = Categories::find($id);
@@ -73,4 +48,6 @@ class CategoriesApiController extends Controller
         $Categories->delete();
         return response()->json(['Категория успешно удалена'], 201);
     }
+
+
 }

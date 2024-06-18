@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateCategoriesApiRequest;
 use App\Models\Boxes;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -16,11 +17,7 @@ class BoxesApiController extends Controller
             'name' => $data['name'],
             'user_id' => $request->user()->id,
         ]);
-        return response()->json([
-            'success' => true,
-            'code' => 201,
-            'message' => 'Ящик создан',
-        ], 201);
+        return response()->json(['message' => 'Ящик создан'], 201);
     }
 
     public function read(Request $request): JsonResponse
@@ -28,7 +25,10 @@ class BoxesApiController extends Controller
         $Boxes = Boxes::all();
         return response()->json($Boxes);
     }
-
+    public function readByUser(Request $request): JsonResponse
+    {
+        return response()->json(User::find($request->user()->id)->boxes()->get());
+    }
     public function updateById(Request $request, $id): JsonResponse
     {
         $Boxes = Boxes::find($id);

@@ -14,25 +14,13 @@ class UserAuthenticationApiController extends Controller
     public function register(UserRegistrationRequest $request): JsonResponse
     {
         $data = $request->all();
-        if ($data['role_id']) {
-            if ($data['role_id'] > 2) {
-                return response()->json(['error' => 'Может быть только 1 - админ, 2-пользователь',], 404);
-            } else if ($data['role_id'] == 2) {
-                $role_id = 2;
-            }
-            $role_id = 1;
-        } else $role_id = 2;
         User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role_id' => $role_id
+            'role_id' => $data['role_id'] ?? 2
         ]);
-        return response()->json([
-            'success' => true,
-            'code' => 201,
-            'message' => 'Success',
-        ], 201);
+        return response()->json(['message' => 'Успешная регистрация'], 201);
     }
 
     public function logout(Request $request): JsonResponse
